@@ -18,13 +18,15 @@
 
 ### Production Dependencies
 
-| **Dependency** | **Use**                                                                                                         |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| express        | Fast, unopinionated, minimalist web framework for node                                                          |
-| mongoose       | Mongoose is a MongoDB object modeling tool designed to work in an asynchronous environment                      |
-| multer         | Multer is a node.js middleware for handling multipart/form-data, which is primarily used for uploading files    |
-| sharp          | The typical use case for this high speed Node.js module is to convert large images in common formats to smaller |
-| validator      | This library validates and sanitizes strings only                                                               |
+| **Dependency** | **Use**                                                                                                                                                                                                                 |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| bcryptjs       | The library is compatible with CommonJS and AMD loaders and is exposed globally as dcodeIO                                                                                                                              |
+| express        | Fast, unopinionated, minimalist web framework for node                                                                                                                                                                  |
+| jsonwebtoken   | (Asynchronous) If a callback is supplied, the callback is called with the err or the JWT. (Synchronous) Returns the JsonWebToken as string payload could be an object literal, buffer or string representing valid JSON |
+| mongoose       | Mongoose is a MongoDB object modeling tool designed to work in an asynchronous environment                                                                                                                              |
+| multer         | Multer is a node.js middleware for handling multipart/form-data, which is primarily used for uploading files                                                                                                            |
+| sharp          | The typical use case for this high speed Node.js module is to convert large images in common formats to smaller                                                                                                         |
+| validator      | This library validates and sanitizes strings only                                                                                                                                                                       |
 
 ### Development Dependencies
 

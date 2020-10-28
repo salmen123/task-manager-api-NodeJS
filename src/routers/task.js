@@ -1,5 +1,6 @@
 const express = require('express');
 
+const auth = require('../middleware/auth');
 const {
   addTask,
   readTasks,
@@ -10,17 +11,17 @@ const {
 
 const router = new express.Router();
 
-router.post('/tasks', addTask);
+router.post('/tasks', auth, addTask);
 
 // GET /tasks?completed=true
 // GET /tasks?limit=10&skip=20
 // GET /tasks?sortBy=createdAt:desc
-router.get('/tasks', readTasks);
+router.get('/tasks', auth, readTasks);
 
-router.get('/tasks/:id', readTaskByID);
+router.get('/tasks/:id', auth, readTaskByID);
 
-router.patch('/tasks/:id', editTaskByID);
+router.patch('/tasks/:id', auth, editTaskByID);
 
-router.delete('/tasks/:id', deleteTaskByID);
+router.delete('/tasks/:id', auth, deleteTaskByID);
 
 module.exports = router;

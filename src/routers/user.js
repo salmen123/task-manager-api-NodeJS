@@ -1,33 +1,40 @@
 const express = require('express');
 
+const auth = require('../middleware/auth');
 const {
-  addUser,
-  readUsers,
-  readUserByID,
-  editUserByID,
-  deleteUserByID,
+  signup,
+  login,
+  logout,
+  logoutAll,
+  getUserProfile,
+  updateUserProfile,
+  deleteUser,
   upload,
-  addAvatarToUserByID,
+  addAvatarUser,
   errorMulterMiddelware,
-  deleteAvatarUserByID,
+  deleteAvatarUser,
   getAvatarUserByID
 } = require('../controllers/user');
 
 const router = new express.Router();
 
-router.post('/users', addUser);
+router.post('/users', signup);
 
-router.get('/users', readUsers);
+router.post('/users/login', login);
 
-router.get('/users/:id', readUserByID);
+router.post('/users/logout', auth, logout);
 
-router.patch('/users/:id', editUserByID);
+router.post('/users/logoutAll', auth, logoutAll);
 
-router.delete('/users/:id', deleteUserByID);
+router.get('/users/me', auth, getUserProfile);
 
-router.post('/users/:id/avatar', upload.single('avatar'), addAvatarToUserByID, errorMulterMiddelware);
+router.patch('/users/me', auth, updateUserProfile);
 
-router.delete('/users/:id/avatar', deleteAvatarUserByID);
+router.delete('/users/me', auth, deleteUser);
+
+router.post('/users/me/avatar', auth, upload.single('avatar'), addAvatarUser, errorMulterMiddelware);
+
+router.delete('/users/me/avatar', auth, deleteAvatarUser);
 
 router.get('/users/:id/avatar', getAvatarUserByID);
 

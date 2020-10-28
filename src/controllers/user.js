@@ -3,39 +3,54 @@ const sharp = require('sharp');
 
 const User = require('../models/user');
 
-exports.addUser = async (req, res) => {
+exports.signup = async (req, res) => {
   const user = new User(req.body);
   try {
     await user.save();
-    res.status(201).send(user);
+    const token = await user.generateAuthToken();
+    res.status(201).send({ user, token });
   } catch (e) {
     res.status(400).send(e);
   }
 };
 
-exports.readUsers = async (req, res) => {
+exports.login = async (req, res) => {
   try {
-    const users = await User.find({});
-    res.send(users);
+    const user = await User.findByCredentials(req.body.email, req.body.password);
+    const token = await user.generateAuthToken();
+    res.send({ user, token });
+  } catch (e) {
+    res.status(400).send();
+  }
+};
+
+exports.logout = async (req, res) => {
+  try {
+    req.user.tokens = req.user.tokens.filter((token) => {
+      return token.token !== req.token;
+    });
+    await req.user.save();
+    res.send();
   } catch (e) {
     res.status(500).send();
   }
 };
 
-exports.readUserByID = async (req, res) => {
-  const _id = req.params.id;
+exports.logoutAll = async (req, res) => {
   try {
-    const user = await User.findById(_id);
-    if (!user) {
-      return res.status(404).send();
-    }
-    res.send(user);
+    req.user.tokens = [];
+    await req.user.save();
+    res.send();
   } catch (e) {
-    res.status(500).send()
+    res.status(500).send();
   }
 };
 
-exports.editUserByID = async (req, res) => {
+exports.getUserProfile = async (req, res) => {
+  res.send(req.user);
+};
+
+exports.updateUserProfile = async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ['name', 'email', 'password', 'age'];
   const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
@@ -43,23 +58,18 @@ exports.editUserByID = async (req, res) => {
     return res.status(400).send({ error: 'Invalid updates!' });
   }
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!user) {
-      return res.status(404).send();
-    }
-    res.send(user);
+    updates.map((update) => req.user[update] = req.body[update]);
+    await req.user.save();
+    res.send(req.user);
   } catch (e) {
     res.status(400).send(e);
   }
 };
 
-exports.deleteUserByID = async (req, res) => {
+exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) {
-      return res.status(404).send();
-    }
-    res.send(user);
+    await req.user.remove();
+    res.send(req.user);
   } catch (e) {
     res.status(500).send();
   }
@@ -78,14 +88,10 @@ exports.upload = multer({
   }
 });
 
-exports.addAvatarToUserByID = async (req, res) => {
+exports.addAvatarUser = async (req, res) => {
   const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer();
-  const user = await User.findById(req.params.id);
-  if (!user) {
-    return res.status(404).send();
-  }
-  user.avatar = buffer;
-  await user.save();
+  req.user.avatar = buffer;
+  await req.user.save();
   res.send();
 };
 
@@ -93,19 +99,10 @@ exports.errorMulterMiddelware = (error, req, res, next) => {
   res.status(400).send({ error: error.message });
 };
 
-exports.deleteAvatarUserByID = async (req, res) => {
-  const _id = req.params.id;
-  try {
-    const user = await User.findOne({ _id });
-    if (!user) {
-      return res.status(404).send();
-    }
-    user.avatar = undefined;
-    await user.save();
-    res.send();
-  } catch (e) {
-    res.status(500).send();
-  }
+exports.deleteAvatarUser = async (req, res) => {
+  req.user.avatar = undefined;
+  await req.user.save();
+  res.send();
 };
 
 exports.getAvatarUserByID = async (req, res) => {
